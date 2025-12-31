@@ -16,7 +16,7 @@ export function ModuleRunner({ address, moduleName, func }: ModuleRunnerProps) {
   const { signAndSubmitTransaction, connected } = useWallet()
   const [args, setArgs] = useState<string[]>(func.params.map(() => ''))
   const [typeArgs, setTypeArgs] = useState<string[]>(func.generic_type_params.map(() => ''))
-  const [result, setResult] = useState<unknown>(null)
+  const [result, setResult] = useState<unknown[] | { success: boolean; hash: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [txHash, setTxHash] = useState<string | null>(null)
@@ -43,13 +43,13 @@ export function ModuleRunner({ address, moduleName, func }: ModuleRunnerProps) {
           return
         }
 
-        const payload = {
-          function: `${address}::${moduleName}::${func.name}`,
-          typeArguments: typeArgs.filter(Boolean),
-          functionArguments: args.slice(0, filteredParams.length).map(parseArg),
-        }
-
-        const response = await signAndSubmitTransaction({ data: payload })
+        const response = await signAndSubmitTransaction({
+          data: {
+            function: `${address}::${moduleName}::${func.name}` as `${string}::${string}::${string}`,
+            typeArguments: typeArgs.filter(Boolean),
+            functionArguments: args.slice(0, filteredParams.length).map(parseArg) as (string | number | boolean | Uint8Array)[],
+          },
+        })
         setTxHash(response.hash)
         setResult({ success: true, hash: response.hash })
       }

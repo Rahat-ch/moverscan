@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Moverscan
 
-## Getting Started
+Block explorer for Movement Network mainnet. Etherscan-style UI for exploring transactions, accounts, blocks, and smart contract modules.
 
-First, run the development server:
+## Features
+
+- **Transaction Explorer** - Browse latest transactions with pagination
+- **Transaction Details** - View tx info, method calls, gas, events
+- **Account Pages** - Transactions, token balances, NFTs, deployed modules
+- **Block Explorer** - Block metadata and transactions in block
+- **Module Viewer** - View ABI, run view/entry functions
+- **Wallet Integration** - Connect Nightly or Razor wallet
+- **Dark/Light Theme** - Toggle with persistent preference
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- React 19, TypeScript
+- Tailwind CSS v4
+- TanStack Query
+- Aptos Wallet Adapter
+- GraphQL (Movement Indexer)
+
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Endpoints
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+No API keys required. Uses public endpoints:
 
-## Learn More
+| Service | URL |
+|---------|-----|
+| Indexer | `https://indexer.mainnet.movementnetwork.xyz/v1/graphql` |
+| RPC | `https://mainnet.movementnetwork.xyz/v1` |
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx              # Main page with routing via query params
+  layout.tsx            # Root layout with providers
+  globals.css           # Tailwind styles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+components/
+  header.tsx            # Nav with theme toggle + wallet
+  search-bar.tsx        # Universal search
+  transaction-list.tsx  # Homepage tx table
+  transaction-detail.tsx
+  account-detail.tsx    # Tabs: txs, tokens, nfts, modules
+  block-detail.tsx
+  theme-toggle.tsx
+  wallet-connect.tsx
+  module-runner.tsx     # Execute view/entry functions
 
-## Deploy on Vercel
+lib/
+  graphql/
+    client.ts           # GraphQL client
+    queries.ts          # All indexer queries
+  rpc/
+    client.ts           # RPC client for modules
+  format.ts             # Address, time, MOVE formatting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+providers/
+  query-provider.tsx    # TanStack Query
+  theme-provider.tsx    # next-themes
+  wallet-provider.tsx   # Aptos Wallet Adapter
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## URL Routes
+
+All routing via query params on `/`:
+
+| Route | Example |
+|-------|---------|
+| Homepage | `/` |
+| Transaction | `/?tx=49287238` |
+| Account | `/?address=0x1234...` |
+| Block | `/?block=15571774` |
+
+## Deployment
+
+```bash
+npm run build
+```
+
+Deploy to Vercel, Netlify, or any Node.js host. No env variables required.
+
+## Movement-Specific Notes
+
+- Transactions identified by `version` number (not hash like Ethereum)
+- Indexer schema differs from standard Aptos (see `spec.md`)
+- All addresses are 64-char hex with `0x` prefix
+
+## License
+
+Apache 2.0 - See [LICENSE](LICENSE)
